@@ -53,15 +53,12 @@ app.all("/:site/*", (req, res) => {
       null,
       new StaticResponseStrategy(200, "POST response")
     ),
-    new Rule(
-      ["*"],
-      [".*"],// match all paths
-      null,
-      new ForwardRequestStrategy()
-    ),
+    Rule.all(new ForwardRequestStrategy())
   ];
 
-  const strategy = rules.find((rule) => rule.isMatch(req))?.strategy!;
+  const matchRule = rules.find((rule) => rule.isMatch(req));
+
+  const strategy = matchRule?.strategy || new ForwardRequestStrategy();
 
   return strategy.build(req, res);
 })

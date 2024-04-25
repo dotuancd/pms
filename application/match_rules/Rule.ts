@@ -6,6 +6,11 @@ import { Request } from "express"
 type Method = "GET" | "POST" | "OPTIONS" | "HEAD" | "PUT" | "PATCH" | "DELETE" | string
 
 export class Rule {
+
+    static all(strategy: ResponseStrategy): Rule {
+        return new Rule(["*"], [".*"], null, strategy)
+    }
+
     constructor(
         public methods: Method[] = ["*"],
         public patterns: string[],
