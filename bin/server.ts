@@ -5,6 +5,7 @@ import { CountBasedErrorStrategy } from "../application/response/CountBasedError
 import { MatchPathErrorStrategy } from "../application/response/MatchPathErrorStragery";
 
 const app = express();
+
 const port = 8080;
 
 app.get("/", (req, res) => {
@@ -20,10 +21,11 @@ app.all("/:site/*", (req, res) => {
   console.log(`Site: ${site}`);
 
   const strategy = new ForwardResponseStrategy(
-    new MatchPathErrorStrategy(
-      ["/campaigns/12321232"]
-    ),
-    // new CountBasedErrorStrategy(2, counterStorage),
+    // new ErrorRateErrorStrategy(0.1)
+    // new MatchPathErrorStrategy(
+    //   ["/campaigns/12321232"]
+    // ),
+    new CountBasedErrorStrategy(2, counterStorage),
   );
 
   return strategy.buildResponse(req, res);
