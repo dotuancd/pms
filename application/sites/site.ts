@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import { ResponseStrategy } from "../response/ResponseStrategy";
-import { ForwardResponseStrategy } from "../response/ForwardResponseStrategy";
+import { ResponseStrategy } from "../strategies/ResponseStrategy";
 
 
 export class Site {
