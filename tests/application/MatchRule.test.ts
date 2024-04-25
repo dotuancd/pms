@@ -1,6 +1,7 @@
 
 import {Request} from "express"
 import { RuleMatcher } from "../../application/match_rules/RuleMatcher"
+import { Rule } from "../../application/match_rules/Rule"
 
 describe('MatchRule', () => {
 
@@ -10,7 +11,7 @@ describe('MatchRule', () => {
             method: "POST"
         } as Request
 
-        const matcher = new RuleMatcher(
+        const matcher = new Rule(
             ["*"],
             [".*"],
         )
@@ -24,7 +25,7 @@ describe('MatchRule', () => {
             method: "POST"
         } as Request
 
-        const matcher = new RuleMatcher(
+        const matcher = new Rule(
             ["POST"],
             ["/"],
         )
@@ -38,7 +39,7 @@ describe('MatchRule', () => {
             method: "GET"
         } as Request
 
-        const matcher = new RuleMatcher(
+        const matcher = new Rule(
             ["POST"],
             ["/"],
         )
@@ -51,7 +52,7 @@ describe('MatchRule', () => {
             url: "http://localhost:8080/post"
         } as Request
 
-        const matcher = new RuleMatcher(
+        const matcher = new Rule(
             ["*"],
             ["/post"],
         )
@@ -64,7 +65,7 @@ describe('MatchRule', () => {
             url: "http://localhost:8080/post"
         } as Request
 
-        const matcher = new RuleMatcher(
+        const matcher = new Rule(
             ["*"],
             ["/get"],
         )
@@ -78,7 +79,7 @@ describe('MatchRule', () => {
             method: "POST"
         } as Request
 
-        const matcher = new RuleMatcher(
+        const matcher = new Rule(
             ["POST"],
             ["/post"],
         )
@@ -92,11 +93,11 @@ describe('MatchRule', () => {
             method: "POST"
         } as Request
 
-        const matcher = new RuleMatcher(
+        const rule = new Rule(
             ["POST"],
             ["/get"],
         )
 
-        expect(matcher.isMatch(request)).toBeFalsy
+        expect(rule.isMatch(request)).toBeFalsy
     })
 })

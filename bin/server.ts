@@ -1,8 +1,10 @@
 import express from "express";
-import { ForwardResponseStrategy } from "../application/response/ForwardResponseStrategy";
-import { ErrorRateErrorStrategy } from "../application/response/RandomErrorStrategy";
-import { CountBasedErrorStrategy } from "../application/response/CountBasedErrorStrategy";
-import { MatchPathErrorStrategy } from "../application/response/MatchPathErrorStragery";
+import { ForwardRequestStrategy } from "../application/strategies/ForwardRequestStrategy";
+import { RatesResponseStrategy } from "../application/strategies/RatesResponseStrategy";
+import { CountBasedResponseStrategy } from "../application/strategies/CountBasedResponseStrategy";
+import { StaticResponseStrategy } from "../application/strategies/StaticResponseStrategy";
+import { Rule } from "../application/match_rules/Rule";
+import { RuleMatcher } from "../application/match_rules/RuleMatcher";
 
 const app = express();
 
@@ -16,19 +18,52 @@ const counterStorage = new Map<string, number>();
 
 app.all("/:site/*", (req, res) => {
   const site = req.params.site;
-  // const path = req.params[0];/\
 
-  console.log(`Site: ${site}`);
+  const rules = [
+    new Rule(
+      ["GET"],
+      ["/get"],
+      null,
+      new RatesResponseStrategy(
+        [
+          [10, new StaticResponseStrategy(200, "10% error")],
+          [20, new StaticResponseStrategy(200, "20% error")],
+          [30, new StaticResponseStrategy(200, "30% error")],
+          [40, new ForwardRequestStrategy],
+        ]
+      )
+    ),
+    new Rule(
+      ["GET"],
+      ["/ip"],
+      null,
+      new CountBasedResponseStrategy(
+        counterStorage, 
+        new ForwardRequestStrategy(),
+        [
+          ["<=", 2, new StaticResponseStrategy(200, "127.0.0.1")],
+          ["<=", 3, new StaticResponseStrategy(200, "192.168.1.1")],
+          ["<", 5, new StaticResponseStrategy(200, "10.0.0.0")],
+        ]
+      )
+    ),
+    new Rule(
+      ["POST"],
+      ["/post"],
+      null,
+      new StaticResponseStrategy(200, "POST response")
+    ),
+    new Rule(
+      ["*"],
+      [".*"],// match all paths
+      null,
+      new ForwardRequestStrategy()
+    ),
+  ];
 
-  const strategy = new ForwardResponseStrategy(
-    // new ErrorRateErrorStrategy(0.1)
-    // new MatchPathErrorStrategy(
-    //   ["/campaigns/12321232"]
-    // ),
-    new CountBasedErrorStrategy(2, counterStorage),
-  );
+  const strategy = rules.find((rule) => rule.isMatch(req))?.strategy!;
 
-  return strategy.buildResponse(req, res);
+  return strategy.build(req, res);
 })
 
 app.listen(port, () => {

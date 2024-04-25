@@ -1,24 +1,14 @@
 
 import { Request, Response } from 'express';
 import { ResponseStrategy } from './ResponseStrategy';
-import { ErrorStrategy } from './ErrorStrategy';
 import { Site } from '../sites/site';
 import { Writable } from "stream"
 
-export class ForwardResponseStrategy implements ResponseStrategy {
-
-    constructor(
-        private errorStragegy: ErrorStrategy
-    ) {}
+export class ForwardRequestStrategy implements ResponseStrategy {
 
     async build(req: Request, res: Response): Promise<Response> {
 
-        const shouldReturnError = await this.errorStragegy.shouldReturnError(req);
         const site = new Site(req.params.site, 'name', 'url', true);
-
-        if (shouldReturnError) {
-            return this.errorStragegy.buildErrorResponse(site, req, res);
-        }
 
         const url = req.originalUrl.replace(new RegExp(`/${site.key}/`), "");
 

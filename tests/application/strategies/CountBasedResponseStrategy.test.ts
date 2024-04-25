@@ -5,10 +5,10 @@ import { Request, Response } from "express";
 describe("CountBasedResponseStrategy", () => {
     it("should return a response based on the count", () => {
         // Arrange
-        const conditions: [number, ResponseStrategy][] = [
-            [2, { build: jest.fn() }],
-            [3, { build: jest.fn() }],
-            [4, { build: jest.fn() }],
+        const conditions: ["<=", number, ResponseStrategy][] = [
+            ["<=", 2, { build: jest.fn() }],
+            ["<=", 3, { build: jest.fn() }],
+            ["<=", 4, { build: jest.fn() }],
         ];
         const fallback = { build: jest.fn() };
         const strategy = new CountBasedResponseStrategy(new Map(), fallback, conditions);
@@ -19,6 +19,6 @@ describe("CountBasedResponseStrategy", () => {
         strategy.build(req, res);
         
         // Assert
-        expect(fallback.build).toHaveBeenCalled();
+        expect(conditions[0][2].build).toHaveBeenCalled();
     })
 })
