@@ -1,0 +1,14 @@
+{
+	"/": [
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
+	"/sites": [
+		"src/routes/sites/+page.ts",
+		"src/routes/sites/+page.server.ts",
+		"src/routes/+layout.ts"
+	],
+	"/sites/create": [
+		"src/routes/+layout.ts"
+	]
+}
