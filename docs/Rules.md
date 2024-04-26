@@ -34,4 +34,13 @@ match:
     - method: ["POST"]
     - prefix: "/users"
 strategy:
-    - FakerResponseStrategy
+    - FakerResponseStrategy(
+        schema = {
+            "data": [
+                {
+                    "id": ${number.int()},
+                    "email": "${internet.email()}"
+                }
+            ]
+        }
+    )

@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Router } from "express";
 import { ForwardRequestStrategy } from "../application/strategies/ForwardRequestStrategy";
 import { RatesResponseStrategy } from "../application/strategies/RatesResponseStrategy";
 import { CountBasedResponseStrategy } from "../application/strategies/CountBasedResponseStrategy";
@@ -26,10 +26,11 @@ app.all("/:site/*", (req, res) => {
       null,
       new RatesResponseStrategy(
         [
-          [10, new StaticResponseStrategy(200, "10% error")],
-          [20, new StaticResponseStrategy(200, "20% error")],
-          [30, new StaticResponseStrategy(200, "30% error")],
-          [40, new ForwardRequestStrategy],
+          [10, new StaticResponseStrategy(400, "10% error")],
+          [20, new StaticResponseStrategy(401, "20% error")],
+          [30, new StaticResponseStrategy(403, "30% error")],
+          [40, new StaticResponseStrategy(200, "40% error")],
+          // [40, new ForwardRequestStrategy],
         ]
       )
     ),

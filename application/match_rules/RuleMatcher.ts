@@ -1,6 +1,8 @@
 
 import { Request } from 'express'
 import { Rule } from './Rule'
+import { pathToRegexp } from 'path-to-regexp'
+import { getTargetUrl } from '../shared';
 
 export class RuleMatcher {
  
@@ -9,9 +11,13 @@ export class RuleMatcher {
     }
 
     private isPatternsMatched(rule: Rule, request: Request) {
-        return rule.patterns.length == 0 || rule.patterns.some((p) => {
-            return new RegExp(p).test(request.url)
+        const targetUrl = getTargetUrl(request);
+        return !rule.routes || rule.patterns.some((p) => {
+            return pathToRegexp(p).test(targetUrl.pathname + targetUrl.search)
         })
+        // return rule.patterns.length == 0 || rule.patterns.some((p) => {
+        //     return new RegExp(p).test(request.url)
+        // })
     }
 
     private isHeaderMatched(rule: Rule, request: Request) {
