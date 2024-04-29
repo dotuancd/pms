@@ -29,7 +29,7 @@ manager.register("rates", (options, manager) => {
     const { rates } = options;
     const strategies = rates.map((rate: any) => {
         const { rate: r, strategy } = rate;
-        return [r, manager.create(strategy.type, strategy)]
+        return [r, manager.create(strategy.type, strategy.options)]
     })
     return new RatesResponseStrategy(strategies);
 });
@@ -39,17 +39,16 @@ manager.register("forward", (options, manager) => {
 });
 
 manager.register("static", (options, manager) => {
-    const { response } = options;
-    const { status, body, headers } = response;
+    const { status, body, headers } = options;
     return new StaticResponseStrategy(status, body, headers);
 })
 
 // We share the counters between all the instances of the CountBasedResponseStrategy
 const counters = new Map<string, number>();
 manager.register("count", (options, manager) => {
-    const { conditions: c, fallback } = options;
-    const conditions = c.map(({operator, value, strategy}) => {
-        return [operator as "<" | "<=" | ">" | ">=" | "==" | "!=", value, manager.create(strategy.type, strategy)] as [string, number, ResponseStrategy];
+    const { senarios, fallback } = options;
+    const conditions = senarios.map(({operator, value, strategy}) => {
+        return [operator as "<" | "<=" | ">" | ">=" | "==" | "!=", value, manager.create(strategy.type, strategy.options)] as [string, number, ResponseStrategy];
     })
     return new CountBasedResponseStrategy(counters, manager.create(fallback.type, fallback), conditions);
 });

@@ -1,0 +1,17 @@
+
+import { PUBLIC_API_URL } from "$env/static/public";
+
+export const getSites = async (teamId: string, fetch: typeof window.fetch) => {
+    const resonse = await fetch(`${PUBLIC_API_URL}/teams/${teamId}/sites`, { credentials: "include"});
+
+    const {data: sites, total} = await resonse.json();
+
+    return {sites, total};
+}
+
+export const getSite = async (siteId: string, fetch: typeof window.fetch) => {
+    const resonse = await fetch(`${PUBLIC_API_URL}/sites/${siteId}`, { credentials: "include"});
+
+    return await resonse.json();
+}
+

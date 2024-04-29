@@ -15,14 +15,24 @@ import { Team } from "../src/entity/Team";
 import { Site } from "../src/entity/Site";
 import { Rule as RuleEntity } from "../src/entity/Rule";
 import nanoid from "../application/shared/nanoid";
+import cors from "cors";
+import morgan from "morgan";
+import cookieParser from "cookie-parser";
+import { manager as strategyFactory } from "../application/strategies/ResponseStrategyFactory";
 
 process.loadEnvFile();
-
-import auth from "../adapters/primary/middlewares/auth";
 import { Jwt } from "../application/shared/jwt";
+import auth from "../adapters/primary/middlewares/auth";
 
 const app = express();
+app.use(cors({
+  origin: ["http://localhost:5173"],
+  credentials: true
+}))
 app.use(express.json());
+app.set("x-powered-by", false);
+app.use(morgan("short"));
+app.use(cookieParser())
 
 const port = 8080;
 
@@ -61,7 +71,7 @@ app.post("/login", async (req, res) => {
 
   delete user.password
   const token = await Jwt.encode({id: user.id})
-  res.cookie("AUTH", token, {httpOnly: true});
+  res.cookie("AUTH", token, {httpOnly: true, sameSite: process.env.AUTH_COOKIE_SAME_SITE as any, secure: process.env.AUTH_COOKIE_SECURE === "true"});
   return res.send({
     ...user,
     token
@@ -169,6 +179,19 @@ app.post("/sites/:siteId/rules", auth, async (req, res) => {
   res.status(201).send(created);
 })
 
+app.get("/rules/:ruleId", auth, async (req, res) => {
+  // create rule
+  const siteId = Number(req.params.ruleId);
+  const rule = await AppDataSource.manager.getRepository(RuleEntity).findOne({where: {id: siteId}});
+  res.send(rule);
+})
+
+app.get("/sites/:siteId", auth, async (req, res) => {
+  const siteId = req.params.siteId;
+  const site = await AppDataSource.manager.getRepository(Site).findOne({where: {id: siteId}});
+
+  res.send(site);
+})
 
 app.get("/sites/:siteId/rules", auth, async (req, res) => {
 
@@ -205,46 +228,34 @@ app.get("/teams", auth, async (req, res) => {
   res.send({ data, total });
 })
 
-app.all("/:site/*", (req, res) => {
-  const site = req.params.site;
+app.get("/teams/:teamId", auth, async (req, res) => {
+  const team = await AppDataSource.manager.getRepository(Team).findOne({
+    where: {
+      id: Number(req.params.teamId)
+    }
+  });
 
-  const rules = [
-    new Rule(
-      ["GET"],
-      ["/get"],
+  res.send(team);
+})
+
+app.all("/p/:siteKey/*", async (req, res) => {
+  const site = await AppDataSource.getRepository(Site).findOne({
+    where: {id: req.params.siteKey},
+    relations: ["rules"]
+  });
+
+  if (!site) {
+    return res.status(404).send("Site not found");
+  }
+
+  const rules = site.rules.map((rule) => {
+    return new Rule(
+      rule.methods,
+      rule.routes,
       null,
-      new RatesResponseStrategy(
-        [
-          [10, new StaticResponseStrategy(400, "10% error")],
-          [20, new StaticResponseStrategy(401, "20% error")],
-          [30, new StaticResponseStrategy(403, "30% error")],
-          [40, new StaticResponseStrategy(200, "40% error")],
-          // [40, new ForwardRequestStrategy],
-        ]
-      )
-    ),
-    new Rule(
-      ["GET"],
-      ["/ip"],
-      null,
-      new CountBasedResponseStrategy(
-        counterStorage, 
-        new ForwardRequestStrategy(),
-        [
-          ["<=", 2, new StaticResponseStrategy(200, "127.0.0.1")],
-          ["<=", 3, new StaticResponseStrategy(200, "192.168.1.1")],
-          ["<", 5, new StaticResponseStrategy(200, "10.0.0.0")],
-        ]
-      )
-    ),
-    new Rule(
-      ["POST"],
-      ["/post"],
-      null,
-      new StaticResponseStrategy(200, "POST response")
-    ),
-    Rule.all(new ForwardRequestStrategy())
-  ];
+      strategyFactory.create(rule.strategy.type, rule.strategy.options),
+    )
+  })
 
   const matchRule = rules.find((rule) => rule.isMatch(req));
 

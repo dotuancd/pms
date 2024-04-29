@@ -5,13 +5,13 @@ export class StaticResponseStrategy implements ResponseStrategy {
     constructor(
         public readonly statusCode: number,
         public readonly body: string,
-        public readonly headers: { [key: string]: string } = {}
+        public readonly headers: {key: string, value: string}[] = []
     ) {}
 
     async build(req: Request, res: Response): Promise<Response> {
-        for (const key in this.headers) {
-            res.setHeader(key, this.headers[key])
-        }
+        this.headers.forEach(({key, value}) => {
+            res.setHeader(key, value)
+        })
 
         return res
             .status(this.statusCode)

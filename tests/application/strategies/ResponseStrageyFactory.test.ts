@@ -16,19 +16,23 @@ describe("ResponseStrategyFactory", () => {
 
     it("shoudld return static response strategy", () => {
         const strategy = manager.create("static", {
-            response: {
-                status: 200,
-                body: '{ "message": "Hello" }',
-                headers: {
-                    'Content-Type': "application/json"
+            status: 200,
+            body: '{ "message": "Hello" }',
+            headers: [
+                {
+                    key: 'Content-Type',
+                    value: "application/json"
                 }
-            }
+            ]
         })
 
         expect(strategy).toEqual(
-            new StaticResponseStrategy(200, '{ "message": "Hello" }', {
-                'Content-Type': "application/json"
-            })
+            new StaticResponseStrategy(200, '{ "message": "Hello" }', [
+                {
+                    key: 'Content-Type',
+                    value: "application/json"
+                }
+            ])
         )
     })
     
@@ -39,10 +43,10 @@ describe("ResponseStrategyFactory", () => {
                     rate: 10,
                     strategy: { 
                         type: "static",
-                        response: {
+                        options: {
                             status: 200,
                             body: '{ "message": "Hello" }',
-                            headers: {"Content-Type": "application/json"}
+                            headers: [{key: "Content-Type", value: "application/json"}]
                         }
                     }
                 },
@@ -50,10 +54,10 @@ describe("ResponseStrategyFactory", () => {
                     rate: 20,
                     strategy: { 
                         type: "static",
-                        response: {
+                        options: {
                             status: 401,
                             body: '{ "message": "unauthorized" }',
-                            headers: {"Content-Type": "application/json"}
+                            headers: [{key: "Content-Type", value: "application/json"}]
                         }
                     }
                 },
@@ -68,8 +72,8 @@ describe("ResponseStrategyFactory", () => {
 
         expect(strategy).toEqual(
             new RatesResponseStrategy([
-                [10, new StaticResponseStrategy(200, '{ "message": "Hello" }', {"Content-Type": "application/json"})],
-                [20, new StaticResponseStrategy(401, '{ "message": "unauthorized" }', {"Content-Type": "application/json"})],
+                [10, new StaticResponseStrategy(200, '{ "message": "Hello" }', [{key: "Content-Type", value: "application/json"}])],
+                [20, new StaticResponseStrategy(401, '{ "message": "unauthorized" }', [{key: "Content-Type", value: "application/json"}])],
                 [70, new ForwardRequestStrategy()]
             ])
         )
@@ -77,16 +81,16 @@ describe("ResponseStrategyFactory", () => {
 
     it('should return a count based response strategy', () => {
         const strategy = manager.create("count", {
-            conditions: [
+            senarios: [
                 {
                     operator: "<=",
                     value: 2,
-                    strategy: { type: "static", response: { status: 200, body: "Hello", headers: {} } }
+                    strategy: { type: "static", options: { status: 200, body: "Hello", headers: [] } }
                 },
                 {
                     operator: "<=",
                     value: 3,
-                    strategy: { type: "static", response: { status: 401, body: "unauthorized", headers: {} } }
+                    strategy: { type: "static", options: { status: 401, body: "unauthorized", headers: [] } }
                 },
                 {
                     operator: ">=",
@@ -102,8 +106,8 @@ describe("ResponseStrategyFactory", () => {
                 new Map(),
                 new ForwardRequestStrategy(),
                 [
-                    ["<=", 2, new StaticResponseStrategy(200, "Hello", {})],
-                    ["<=", 3, new StaticResponseStrategy(401, "unauthorized", {})],
+                    ["<=", 2, new StaticResponseStrategy(200, "Hello", [])],
+                    ["<=", 3, new StaticResponseStrategy(401, "unauthorized", [])],
                     [">=", 5, new ForwardRequestStrategy()]
                 ]
             )
