@@ -32,7 +32,9 @@
                 return {
                     type: "rates",
                     options: {
-                        rates: []
+                        rates: [
+                            {rate: 10, strategy: {type: "forward"}}
+                        ]
                     }
                 };
             case "count":
@@ -49,21 +51,29 @@
     $: value = isNew ? getStrategyByType(strategyType) : value;
 </script>
 <div class="flex flex-row gap-2 my-2">
-    <div>
-        <input type="radio" name="{idPrefix}" bind:group={strategyType} value="forward" id="{idPrefix}-forward">
-        <label for="{idPrefix}-forward">Forward</label>
+    <div class="form-control">
+        <label class="label cursor-pointer">
+            <input type="radio" class="radio" name="{idPrefix}" bind:group={strategyType} value="forward">
+            <span class="label-text ml-2">Forward</span>
+        </label>
     </div>
-    <div>
-        <input type="radio" name="{idPrefix}" bind:group={strategyType} value="static" id="{idPrefix}-static">
-        <label for="{idPrefix}-static">Static</label>
+    <div class="form-control">
+        <label class="label cursor-pointer">
+            <input type="radio" class="radio" name="{idPrefix}" bind:group={strategyType} value="static">
+            <span class="label-text ml-2">Static</span>
+        </label>
     </div>
-    <div>
-        <input type="radio" name="{idPrefix}" bind:group={strategyType} value="rates" id="{idPrefix}-rates">
-        <label for="{idPrefix}-rates">Rates</label>
+    <div class="form-control">
+        <label class="label cursor-pointer">
+            <input type="radio" class="radio" name="{idPrefix}" bind:group={strategyType} value="rates">
+            <span class="label-text ml-2">Rates</span>
+        </label>
     </div>
-    <div>
-        <input type="radio" name="{idPrefix}" bind:group={strategyType} value="count" id="{idPrefix}-count">
-        <label for="{idPrefix}-count">Count</label>
+    <div class="form-control">
+        <label class="label cursor-pointer">
+            <input type="radio" class="radio" name="{idPrefix}" bind:group={strategyType} value="count">
+            <span class="label-text ml-2">Count</span>
+        </label>
     </div>
 </div>
 

@@ -4,17 +4,17 @@ export function styleForMethod(method: string) {
     switch (method) {
         case "GET":
         case "HEAD":
-            return "text-green-700";
+            return "text-primary";
         case "POST":
-            return "text-yellow-700";
+            return "text-secondary";
         case "PUT":
-            return "text-blue-700";
+            return "text-accent";
         case "DELETE":
-            return "text-red-700";
+            return "text-error";
         case "PATCH":
-            return "text-purple-700";
+            return "text-info";
         case "OPTIONS":
-            return "text-pink-700";
+            return "text-warning";
         default:
             return "text-green-700";
     }

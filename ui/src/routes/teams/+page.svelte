@@ -1,6 +1,12 @@
 <script lang="ts">
     import { page } from "$app/stores";
+	import CreateButton from "$lib/atoms/CreateButton.svelte";
     import TeamIcon from "$lib/atoms/TeamIcon.svelte";
+	import Breadcrumb from "$lib/molecules/Breadcrumb.svelte";
+
+    const breadcrumbs = [
+        { name: "Teams" }
+    ];
 </script>
 
 <svelte:head>
@@ -8,25 +14,24 @@
 </svelte:head>
 
 <div>
+    <Breadcrumb items={breadcrumbs} />
     <header class="py-8 my-8 flex flex-row justify-between items-center">
         <div>
-            <h1 class="block text-2xl font-bold text-gray-800 sm:text-3xl">Teams</h1>
-            <p class="mt-3 sm:text-lg text-gray-800 dark:text-neutral-400">
+            <h1 class="block text-2xl font-bold text-accent sm:text-3xl">Teams</h1>
+            <p class="mt-3 sm:text-lg text-accent-content">
                 Teams that have access to the site
             </p>
         </div>
         <div class="">
-            <a href="/sites/{$page.params.site_id}/create">
-                <button type="button" class="bg-green-500 font-medium text-gray-100 rounded px-2 py-1">+ Add team</button>
-            </a>
+            <a href="/teams/create" class="btn btn-primary">+ New team</a>
         </div>
     </header>
-    <div class="flex flex-col shadow-lg rounded-lg">
+    <div class="flex flex-col gap-3">
         {#each $page.data.teams as team}
-            <a class="cursor-pointer flex gap-4 items-center border-b p-4 hover:bg-gray-50" href={`/teams/${team.id}/sites`}>
+            <a class="cursor-pointer shadow rounded-box flex gap-4 items-center p-4 hover:bg-base-200" href={`/teams/${team.id}/sites`}>
                 <TeamIcon />
                 <div>
-                    <span class="text-sky-500 font-bold">{team.name}</span>
+                    <span class="text-primary font-bold">{team.name}</span>
                     <p>{team.description}</p>
                 </div>
             </a>

@@ -41,59 +41,62 @@
 
 <div class="">
     <header class="pb-8 mb-8">
-        <h1 class="block text-2xl font-bold text-gray-800 sm:text-3xl">Create response rule</h1>
-        <p class="mt-3 sm:text-lg text-gray-800 dark:text-neutral-400">
+        <h1 class="block text-2xl font-bold text-accent sm:text-3xl">Create response rule</h1>
+        <p class="mt-3 sm:text-lg text-accent-content">
             Create a new response rule for the site
         </p>
     </header>
     <form class="flex flex-col gap-4" on:submit|preventDefault={onSubmit}>
         <div>
-            <h3 class="text-sm text-sky-500 font-semibold">Routes</h3>
-            <p class="my-3 text-gray-600">
-                The route to match the request. You can use wildcards like <code class="text-orange-400 font-medium bg-slate-100 px-1 rounded">/users/.*</code>
-                to match all routes starting with <code class="text-orange-400 font-medium bg-slate-100 px-1 rounded">/users/</code>.
-                You can also use <code class="text-orange-400 font-medium bg-slate-100 px-1 rounded">/users/:userId</code> to match a specific route.
-                The route must start with a <code class="text-orange-400 font-medium bg-slate-100 px-1 rounded">/</code>
+            <h3 class="text-sm text-accent font-semibold">Routes</h3>
+            <p class="my-3 text-accent-content">
+                The route to match the request. You can use wildcards like <code class="text-accent-content bg-accent font-medium px-1 rounded-box">/users/.*</code>
+                to match all routes starting with <code class="text-accent-content bg-accent font-medium px-1 rounded-box">/users/</code>.
+                You can also use <code class="text-accent-content bg-accent font-medium px-1 rounded-box">/users/:userId</code> to match a specific route.
+                The route must start with a <code class="text-accent-content bg-accent font-medium px-1 rounded-box">/</code>
             </p>
-            <input type="text" bind:value={routes[0]} class="p-2 border rounded w-full" name="route" id="route" placeholder="/example" required>
+            <input type="text" bind:value={routes[0]} name="route" id="route" required placeholder="/example" class="input input-bordered w-full" />
+            <!-- <input type="text" bind:value={routes[0]} class="p-2 border rounded w-full" name="route" id="route" placeholder="/example" required> -->
         </div>
         
         <div>
-            <h3 class="text-sm text-sky-500 font-semibold">Methods</h3>
-            <p class="mt-3 text-gray-600">
+            <h3 class="text-sm text-accent font-semibold">Methods</h3>
+            <p class="mt-3 text-accent-content">
                 The methods that this rule should match.
             </p>
             <div class="mt-3 flex flex-row gap-1">
-                <div>
-                    <input type="checkbox" on:change={toggleAll} checked={selectedMethods.length === supportedMethods.length} id="method-all">
-                    <label for="method-all">ALL</label>
+                <div class="form-control">
+                    <label class="label cursor-pointer">
+                        <input type="checkbox" class="checkbox" id="method-all" on:change={toggleAll} checked={selectedMethods.length === supportedMethods.length}>
+                        <span class="label-text ml-2 font-bold">ALL</span>
+                    </label>
                 </div>
                 {#each supportedMethods as method}
-                    <div>
-                        <input type="checkbox" multiple bind:group={selectedMethods} value={method} id={"method-" + method.toLowerCase()}>
-                        <label for={"method-" + method.toLowerCase()} class="font-bold {styleForMethod(method)}">{method}</label>
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <input type="checkbox" id="method-{method}" class="checkbox" multiple bind:group={selectedMethods} value={method} />
+                            <span class="label-text ml-2 font-bold {styleForMethod(method)}">{method}</span> 
+                        </label>
                     </div>
                 {/each}
             </div>
         </div>
     
         <div>
-            <h3 class="text-sm text-sky-500 font-semibold">Strategy</h3>
-            <p class="mt-3 text-gray-600">
+            <h3 class="text-sm text-accent font-semibold">Strategy</h3>
+            <p class="mt-3 text-accent-content">
                 The response strategy for this rule.
             </p>
             <SelectStrategy bind:value={strategy} strategyType={strategy.type} bind:isNew></SelectStrategy>
         </div>
     
         <div class="flex items-center gap-2">
-            <button class="text-center inline-flex font-semibold items-center bg-green-600 hover:bg-green-700 px-2 py-1 text-gray-100 rounded" type="submit">
+            <button class="btn btn-primary" type="submit">
                 <SaveIcon/> Save
             </button>
 
-            <a href="/sites/{$page.params.site_id}">
-                <button type="button" class="text-center inline-flex font-semibold items-center hover:text-sky-800 px-2 py-1 text-gray-600 rounded">
-                    Back
-                </button>
+            <a href="/sites/{$page.params.site_id}" class="btn btn-link">
+                Back
             </a>
         </div>
     </form>

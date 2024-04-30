@@ -1,36 +1,30 @@
 <script lang="ts">
     import { page } from "$app/stores";
     import SiteIcon from "$lib/atoms/SiteIcon.svelte";
+	import TeamIcon from "$lib/atoms/TeamIcon.svelte";
+	import Header from "../header.svelte";
+	import Tabs from "../nav.svelte";
 </script>
 <svelte:head>
     <title>{$page.data.name} - Sites</title>
 </svelte:head>
 <div>
-    <header class="py-8 my-8 flex flex-row justify-between items-center">
-        <div>
-            <h1 class="block text-2xl font-bold text-gray-800 sm:text-3xl"> {$page.data.name}</h1>
-            <p class="mt-3 sm:text-lg text-gray-800 dark:text-neutral-400">
-                {$page.data.description}
-            </p>
-        </div>
-        <div class="">
-            <a href="/sites/{$page.params.site_id}/create">
-                <button type="button" class="bg-green-500 font-medium text-gray-100 rounded px-2 py-1">+ Add site</button>
-            </a>
-        </div>
-    </header>
-    <div class="flex flex-col shadow-lg rounded-lg">
+    <Header newButtonHref="/teams/{$page.params.team_id}/sites/create" newButtonLabel="+ New site" />
+    <Tabs activeTab="sites" />
+    <div class="flex flex-col gap-3">
         {#each $page.data.sites as site}
-            <a class="cursor-pointer flex gap-4 items-center border-b p-4 hover:bg-gray-50" href={`/sites/${site.id}`}>
+            <a class="rounded-box shadow cursor-pointer flex gap-4 items-center p-4 hover:bg-base-200" href={`/sites/${site.id}`}>
                 <SiteIcon />
                 <div>
-                    <span class="text-sky-500 font-bold">{site.title}</span>
+                    <span class="text-primary font-bold">{site.title}</span>
                     <p>{site.description}</p>
                 </div>
             </a>
         {:else}
             <!-- Write a message and let user create new one -->
-            <p>No sites found. <a href="/rules/{$page.params.site_id}/create">Create one</a></p>
+            <div class="bg-gray-50 p-4 rounded text-center">
+                No sites found. <a class="text-primary font-bold" href="/teams/{$page.params.team_id}/sites/create">Create one</a>
+            </div>
         {/each}
     </div>
 </div>
