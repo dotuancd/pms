@@ -8,7 +8,7 @@ describe('MatchRule', () => {
 
     it('Should match by all', () => {
         const request = {
-            originalUrl: "/FfuIRQ0TuOWNKakN8V1ku/http://localhost:8080/post",
+            originalUrl: "/p/FfuIRQ0TuOWNKakN8V1ku/http://localhost:8080/post",
             method: "POST"
         } as Request
 
@@ -19,7 +19,7 @@ describe('MatchRule', () => {
 
     it('Should match by methods', () => {
         const request = {
-            originalUrl: "/W52smpcfX-YvQyj1eHRnc/http://localhost:8080/post",
+            originalUrl: "/p/W52smpcfX-YvQyj1eHRnc/http://localhost:8080/post",
             method: "POST"
         } as Request
 
@@ -47,7 +47,7 @@ describe('MatchRule', () => {
 
     it("Should match by path", () => {
         const request = {
-            originalUrl: "/x/http://localhost:8080/post"
+            originalUrl: "/p/x/http://localhost:8080/post"
         } as Request
 
         const matcher = new Rule(
@@ -60,7 +60,7 @@ describe('MatchRule', () => {
 
     it("Should not match by path", () => {
         const request = {
-            originalUrl: "/x/http://localhost:8080/post"
+            originalUrl: "/p/x/http://localhost:8080/post"
         } as Request
 
         const matcher = new Rule(
@@ -73,7 +73,7 @@ describe('MatchRule', () => {
 
     it("Should match by path and method", () => {
         const request = {
-            originalUrl: "/x/http://localhost:8080/post",
+            originalUrl: "/p/x/http://localhost:8080/post",
             method: "POST"
         } as Request
 
@@ -87,7 +87,7 @@ describe('MatchRule', () => {
 
     it("Should not match by path and method", () => {
         const request = {
-            originalUrl: "/x/http://localhost:8080/post",
+            originalUrl: "/p/x/http://localhost:8080/post",
             method: "POST",
         } as Request
 
