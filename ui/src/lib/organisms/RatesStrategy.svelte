@@ -7,14 +7,11 @@
     export let value: RatesStrategy;
     export let idPrefix = "";
 
-    value.options.rates.push({rate: 10, strategy: {type: "forward"}});
+    // value.options.rates.push({rate: 10, strategy: {type: "forward"}});
 
     function addRate() {
-        // value.options.rates.push({rate: 10, strategy: {type: "forward"}});
-        value.options.rates = [
-            ...value.options.rates,
-            {rate: 10, strategy: {type: "forward"}}
-        ];
+        value.options.rates.push({rate: 10, strategy: {type: "forward"}});
+        value.options.rates = value.options.rates 
     }
 
     function totalRate() {
@@ -29,10 +26,10 @@
                     <label class="label cursor-pointer">
                         <span class="label-text ml-2">Weight</span>
                         <input class="px-2 py-1 w-20" type="number" id="{idPrefix}-rate-{index}" bind:value={rate.rate} />
+                        <span class="ml-2">
+                            Rates: <span class="ml-2 font-bold">{Math.round(rate.rate / totalRate() * 100)}%</span>
+                        </span>
                     </label>
-                    
-                    Rates:
-                    <span class="ml-2 font-bold">{Math.round(rate.rate / totalRate() * 100)}%</span>
                 </div>
                 <div>
                     <button class="btn btn-error btn-ghost text-error" type="button" on:click={() => value.options.rates = value.options.rates.filter((_, i) => i !== index)}>

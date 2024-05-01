@@ -1,6 +1,6 @@
-import { getSite } from "$lib/api/sites";
+import { getTeam } from "$lib/api/teams";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({fetch, params}) => {
-    return getSite(params.site_id, fetch);
+    return getTeam(params.team_id, fetch);
 }

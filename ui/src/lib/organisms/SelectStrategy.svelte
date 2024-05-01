@@ -1,19 +1,25 @@
 
 <script lang="ts">
-    import { type StrategyTypes } from "$lib/Strategy";
+    import { type StrategyTypes, type Strategy as ResponseStrategy } from "$lib/Strategy";
 	import RatesStrategy from "./RatesStrategy.svelte";
 	import CountStrategy from "./CountStrategy.svelte";
 	import StaticStrategyView from "./StaticStrategy.svelte";
     
-    export let strategyType: StrategyTypes = "forward";
     export let idPrefix = "strategy";
-    export let isNew: boolean = true;
+    // export let isNew: boolean = true;
 
-    export let value: any = {
-        type: strategyType
-    };
+    export let value: ResponseStrategy;
 
-    function getStrategyByType(type: StrategyTypes) {
+    let strategyType: StrategyTypes = value.type;
+
+    const supportedStrategies: {value: StrategyTypes, label: string}[] = [
+        { value: "forward", label: "Forward" },
+        { value: "static", label: "Static" },
+        { value: "rates", label: "Rates" },
+        { value: "count", label: "Count" }
+    ];
+
+    function getStrategyByType(type: StrategyTypes): ResponseStrategy {
         switch (type) {
             case "forward":
                 return {
@@ -32,9 +38,7 @@
                 return {
                     type: "rates",
                     options: {
-                        rates: [
-                            {rate: 10, strategy: {type: "forward"}}
-                        ]
+                        rates: []
                     }
                 };
             case "count":
@@ -48,33 +52,22 @@
         }
     }
 
-    $: value = isNew ? getStrategyByType(strategyType) : value;
+    $: {
+        // if (strategyType) {
+        //     value = getStrategyByType(strategyType);
+        // }
+    }
+    // $: value = isNew ? getStrategyByType(strategyType) : value;
 </script>
-<div class="flex flex-row gap-2 my-2">
-    <div class="form-control">
-        <label class="label cursor-pointer">
-            <input type="radio" class="radio" name="{idPrefix}" bind:group={strategyType} value="forward">
-            <span class="label-text ml-2">Forward</span>
-        </label>
-    </div>
-    <div class="form-control">
-        <label class="label cursor-pointer">
-            <input type="radio" class="radio" name="{idPrefix}" bind:group={strategyType} value="static">
-            <span class="label-text ml-2">Static</span>
-        </label>
-    </div>
-    <div class="form-control">
-        <label class="label cursor-pointer">
-            <input type="radio" class="radio" name="{idPrefix}" bind:group={strategyType} value="rates">
-            <span class="label-text ml-2">Rates</span>
-        </label>
-    </div>
-    <div class="form-control">
-        <label class="label cursor-pointer">
-            <input type="radio" class="radio" name="{idPrefix}" bind:group={strategyType} value="count">
-            <span class="label-text ml-2">Count</span>
-        </label>
-    </div>
+<div class="flex flex-wrap gap-2 my-2">
+    {#each supportedStrategies as supportStrategy}
+        <div class="form-control">
+            <label class="label cursor-pointer">
+                <input type="radio" class="radio" name="{idPrefix}_strategy" bind:group={strategyType} on:click={() => value=getStrategyByType(supportStrategy.value)} value="{supportStrategy.value}">
+                <span class="label-text ml-2">{supportStrategy.label}</span>
+            </label>
+        </div>
+    {/each}
 </div>
 
 {#if (value.type === "forward") }

@@ -12,7 +12,7 @@
 <header class="py-8 my-8 flex flex-row justify-between items-center">
     <div>
         <h1 class="block text-2xl font-bold text-accent sm:text-3xl"> {$page.data.name}</h1>
-        <p class="mt-3 sm:text-lg text-accent-content">
+        <p class="mt-3 sm:text-lg prose">
             {$page.data.description}
         </p>
     </div>

@@ -18,7 +18,7 @@
     <header class="py-8 my-8 flex flex-row justify-between items-center">
         <div>
             <h1 class="block text-2xl font-bold text-accent sm:text-3xl">Teams</h1>
-            <p class="mt-3 sm:text-lg text-accent-content">
+            <p class="mt-3 sm:text-lg prose">
                 Teams that have access to the site
             </p>
         </div>
@@ -32,7 +32,7 @@
                 <TeamIcon />
                 <div>
                     <span class="text-primary font-bold">{team.name}</span>
-                    <p>{team.description}</p>
+                    <p>{team.description || ""}</p>
                 </div>
             </a>
         {/each}

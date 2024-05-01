@@ -15,3 +15,15 @@ export const getSite = async (siteId: string, fetch: typeof window.fetch) => {
     return await resonse.json();
 }
 
+export const createSite = async (teamId: string, site: any, fetch: typeof window.fetch) => {
+    const resonse = await fetch(`${PUBLIC_API_URL}/teams/${teamId}/sites`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(site),
+        credentials: "include"
+    });
+
+    return await resonse.json();
+}

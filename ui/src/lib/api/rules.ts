@@ -14,6 +14,14 @@ export const getRule = async (ruleId: string, fetch: typeof window.fetch) => {
     return resonse.json();
 }
 
+export const deleteRule = async (ruleId: string, fetch: typeof window.fetch) => {
+    const response = await fetch(`${PUBLIC_API_URL}/rules/${ruleId}`, {
+        method: "DELETE",
+        credentials: "include"
+    });
+
+    return response.status === 204;
+}
 
 export const createRule = async (siteId: string, rule: any, fetch: typeof window.fetch) => {
     const response = await fetch(`${PUBLIC_API_URL}/sites/${siteId}/rules`, {

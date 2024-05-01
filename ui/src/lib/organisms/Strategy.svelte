@@ -1,6 +1,7 @@
 
 <script lang="ts">
     import type { Strategy } from "$lib/Strategy";
+	import CountStrategy from "./CountStrategy.svelte";
 	import RatesStrategy from "./RatesStrategy.svelte";
 	import StaticStrategy from "./StaticStrategy.svelte";
 
@@ -19,10 +20,7 @@
 {/if}
 
 {#if value.type == "count"}
-    <div>
-        <h2>Count</h2>
-        <p>Count the number of requests</p>
-    </div>
+    <CountStrategy {value} />
 {/if}
 
 {#if value.type == "rates"}

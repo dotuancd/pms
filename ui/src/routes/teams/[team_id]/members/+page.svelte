@@ -14,18 +14,13 @@
     <Tabs activeTab="members" />
     <div class="flex flex-col">
         {#each $page.data.members as member}
-            <a class="cursor-pointer rounded-box shadow flex gap-4 items-center p-4 hover:bg-base-200" href={`/sites/${member.id}`}>
+            <a  href="#" class="cursor-pointer rounded-box shadow flex gap-4 items-center p-4 hover:bg-base-200">
                 <MemberIcon />
                 <div>
                     <span class="text-primary font-bold">{member.name}</span>
                     <p>{member.email}</p>
                 </div>
             </a>
-        {:else}
-            <!-- Write a message and let user create new one -->
-            <div class="bg-gray-50 p-4 rounded text-center">
-                No sites found. <a class="text-primary font-bold" href="/teams/{$page.params.team_id}/sites/create">Create one</a>
-            </div>
         {/each}
     </div>
 </div>

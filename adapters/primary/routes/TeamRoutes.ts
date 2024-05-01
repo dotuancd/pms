@@ -89,8 +89,8 @@ router.post("/:teamId/sites", auth, async (req, res) => {
   
     const result = z.object({
       title: z.string().min(1),
-      url: z.string().url().optional(),
-      description: z.string().optional(),
+      url: z.string().min(1).url().optional().nullable(),
+      description: z.string().optional().nullable(),
     }).safeParse(req.body);
   
     if (! result.success) {

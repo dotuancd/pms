@@ -5,6 +5,8 @@
 	import SaveIcon from "$lib/atoms/SaveIcon.svelte";
     import { page } from "$app/stores";
     import { createRule } from "$lib/api/rules";
+	import { goto } from "$app/navigation";
+    import Breadcrumb from "$lib/molecules/Breadcrumb.svelte";
 
     export let strategy: Strategy = {
         type: "forward",
@@ -14,6 +16,13 @@
     export let routes: string[] = [""];
     export let methods: string[] = [];
     export let isNew: boolean = true;
+
+    const breadcrumbs = [
+        { name: "Teams", href: "/teams" },
+        { name: $page.data.team.name, href: `/teams/${$page.data.team.id}/sites`},
+        { name: $page.data.title, href: `/sites/${$page.data.id}`},
+        { name: "Create Rule" }
+    ];
 
     const supportedMethods = ["GET", "HEAD", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"];
 
@@ -34,37 +43,40 @@
             strategy,
         }, fetch);
 
-        alert("Rule created");
+        if (rule) {
+            goto(`/sites/${$page.params.site_id}`)
+            return;
+        }
     }
 
 </script>
 
 <div class="">
-    <header class="pb-8 mb-8">
+    <Breadcrumb items={breadcrumbs} />
+    <header class="py-8 my-8 flex flex-row justify-between items-center">
         <h1 class="block text-2xl font-bold text-accent sm:text-3xl">Create response rule</h1>
-        <p class="mt-3 sm:text-lg text-accent-content">
+        <p class="mt-3 sm:text-lg prose">
             Create a new response rule for the site
         </p>
     </header>
     <form class="flex flex-col gap-4" on:submit|preventDefault={onSubmit}>
         <div>
             <h3 class="text-sm text-accent font-semibold">Routes</h3>
-            <p class="my-3 text-accent-content">
+            <p class="my-3">
                 The route to match the request. You can use wildcards like <code class="text-accent-content bg-accent font-medium px-1 rounded-box">/users/.*</code>
                 to match all routes starting with <code class="text-accent-content bg-accent font-medium px-1 rounded-box">/users/</code>.
                 You can also use <code class="text-accent-content bg-accent font-medium px-1 rounded-box">/users/:userId</code> to match a specific route.
                 The route must start with a <code class="text-accent-content bg-accent font-medium px-1 rounded-box">/</code>
             </p>
             <input type="text" bind:value={routes[0]} name="route" id="route" required placeholder="/example" class="input input-bordered w-full" />
-            <!-- <input type="text" bind:value={routes[0]} class="p-2 border rounded w-full" name="route" id="route" placeholder="/example" required> -->
         </div>
         
         <div>
             <h3 class="text-sm text-accent font-semibold">Methods</h3>
-            <p class="mt-3 text-accent-content">
+            <p class="mt-3">
                 The methods that this rule should match.
             </p>
-            <div class="mt-3 flex flex-row gap-1">
+            <div class="mt-3 flex flex-wrap gap-1">
                 <div class="form-control">
                     <label class="label cursor-pointer">
                         <input type="checkbox" class="checkbox" id="method-all" on:change={toggleAll} checked={selectedMethods.length === supportedMethods.length}>
@@ -84,10 +96,10 @@
     
         <div>
             <h3 class="text-sm text-accent font-semibold">Strategy</h3>
-            <p class="mt-3 text-accent-content">
+            <p class="mt-3">
                 The response strategy for this rule.
             </p>
-            <SelectStrategy bind:value={strategy} strategyType={strategy.type} bind:isNew></SelectStrategy>
+            <SelectStrategy bind:value={strategy}></SelectStrategy>
         </div>
     
         <div class="flex items-center gap-2">

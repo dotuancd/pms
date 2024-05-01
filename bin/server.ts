@@ -82,6 +82,13 @@ app.get("/rules/:ruleId", auth, async (req, res) => {
   res.send(rule);
 })
 
+app.delete("/rules/:ruleId", auth, async (req, res) => {
+  // create rule
+  const siteId = Number(req.params.ruleId);
+  await AppDataSource.manager.getRepository(RuleEntity).delete(siteId);
+  res.status(204).send();
+})
+
 app.get("/sites/:siteId", auth, async (req, res) => {
   const siteId = req.params.siteId;
   const site = await AppDataSource.manager.getRepository(Site).findOne({

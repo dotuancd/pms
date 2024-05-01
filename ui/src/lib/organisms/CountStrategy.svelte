@@ -38,13 +38,13 @@
             You can add multiple senarios to match the count.
         </p>
 
-        {#each value.options.senarios as count, index}
+        {#each value.options.senarios as senario, index}
             <div class="bg-slate-100 m-2 shadow-xl p-4 rounded-lg">
                 <div class="flex justify-between">
                     <div class="flex gap-4">
                         <div>
                             <label for="{idPrefix}-operator-{index}">Operator</label>
-                            <select class="mx-2 px-2 py-1" id="{idPrefix}-operator-{index}" bind:value={count.operator}>
+                            <select class="select select-sm" id="{idPrefix}-operator-{index}" bind:value={senario.operator}>
                                 {#each operations as operation}
                                     <option value={operation}>{operation}</option>
                                 {/each}
@@ -52,7 +52,7 @@
                         </div>
                         <div>
                             <label for="{idPrefix}-rate-{index}">Value</label>
-                            <input class="px-2 py-1 w-20" type="number" id="{idPrefix}-rate-{index}" bind:value={count.value} />
+                            <input class="input input-sm w-20" type="number" id="{idPrefix}-rate-{index}" bind:value={senario.value} />
                         </div>
                     </div>
                     <div class="justify-end">
@@ -62,13 +62,14 @@
                     </div>
                 </div>
                 <div>
-                    <SelectStrategy bind:value={count.strategy} idPrefix="{idPrefix}_{index}_s" />
+                    {@debug(senario)}
+                    <SelectStrategy bind:value={senario.strategy} idPrefix="{idPrefix}_{index}_select" />
                 </div>
             </div>
         {/each}
 
         <div class="my-4 mx-2">
-            <button class="bg-gray-100 border-2 border-gray-900 border-dashed font-medium px-2 py-1 rounded w-full hover:bg-gray-200" type="button" on:click={newSenario}>
+            <button class="btn btn-secondary btn-block btn-sm border-dashed border-box btn-outline border-2" type="button" on:click={newSenario}>
                 + Add Senario
             </button>
         </div>

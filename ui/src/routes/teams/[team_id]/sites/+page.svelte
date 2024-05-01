@@ -17,11 +17,10 @@
                 <SiteIcon />
                 <div>
                     <span class="text-primary font-bold">{site.title}</span>
-                    <p>{site.description}</p>
+                    <p>{site.description || ""}</p>
                 </div>
             </a>
         {:else}
-            <!-- Write a message and let user create new one -->
             <div class="bg-gray-50 p-4 rounded text-center">
                 No sites found. <a class="text-primary font-bold" href="/teams/{$page.params.team_id}/sites/create">Create one</a>
             </div>
