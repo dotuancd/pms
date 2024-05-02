@@ -13,7 +13,7 @@ export class RuleMatcher {
     private isPatternsMatched(rule: Rule, request: Request) {
         const targetUrl = getTargetUrl(request);
         return !rule.routes || rule.patterns.some((p) => {
-            return pathToRegexp(p).test(targetUrl.pathname + targetUrl.search)
+            return pathToRegexp(p).test(targetUrl.pathname)
         })
         // return rule.patterns.length == 0 || rule.patterns.some((p) => {
         //     return new RegExp(p).test(request.url)

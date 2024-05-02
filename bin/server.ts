@@ -1,30 +1,20 @@
 
-import express, { Router } from "express";
+import express from "express";
 import { ForwardRequestStrategy } from "../application/strategies/ForwardRequestStrategy";
-import { RatesResponseStrategy } from "../application/strategies/RatesResponseStrategy";
-import { CountBasedResponseStrategy } from "../application/strategies/CountBasedResponseStrategy";
-import { StaticResponseStrategy } from "../application/strategies/StaticResponseStrategy";
 import { Rule } from "../application/match_rules/Rule";
-import { RuleMatcher } from "../application/match_rules/RuleMatcher";
 import { AppDataSource } from "../src/data-source";
-import { z } from "zod";
-import { pbkdf2 } from "crypto"
-import { Password } from "../application/shared/password";
-import { User } from "../src/entity/User";
-import { Team } from "../src/entity/Team";
 import { Site } from "../src/entity/Site";
 import { Rule as RuleEntity } from "../src/entity/Rule";
-import nanoid from "../application/shared/nanoid";
 import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import { manager as strategyFactory } from "../application/strategies/ResponseStrategyFactory";
 
 process.loadEnvFile();
-import { Jwt } from "../application/shared/jwt";
 import auth from "../adapters/primary/middlewares/auth";
 import TeamRoutes from "../adapters/primary/routes/TeamRoutes";
 import AuthRoutes from "../adapters/primary/routes/AuthRoutes";
+import SiteRoutes from "../adapters/primary/routes/SiteRoutes";
 
 const app = express();
 app.use(cors({
@@ -43,37 +33,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/teams", TeamRoutes)
+app.use("/sites", SiteRoutes)
 app.use(AuthRoutes)
-
-app.post("/sites/:siteId/rules", auth, async (req, res) => {
-  // create rule
-
-  const result = z.object({
-    methods: z.array(z.string()).min(1),
-    routes: z.array(z.string()).min(1),
-    strategy: z.object({
-      type: z.string().min(1),
-      options: z.any(),
-    }),
-  }).safeParse(req.body);
-
-  if (! result.success) {
-    return res.status(400).send(result.error);
-  }
-
-  const siteId = req.params.siteId;
-  const site = await AppDataSource.manager.getRepository(Site).findOne({where: {id: siteId}});
-
-  const rule = new RuleEntity();
-  rule.methods = result.data.methods;
-  rule.routes = result.data.routes;
-  // @ts-ignore
-  rule.strategy = result.data.strategy;
-  rule.site = site;
-
-  const created = await AppDataSource.manager.getRepository(RuleEntity).save(rule);
-  res.status(201).send(created);
-})
 
 app.get("/rules/:ruleId", auth, async (req, res) => {
   // create rule
@@ -87,24 +48,6 @@ app.delete("/rules/:ruleId", auth, async (req, res) => {
   const siteId = Number(req.params.ruleId);
   await AppDataSource.manager.getRepository(RuleEntity).delete(siteId);
   res.status(204).send();
-})
-
-app.get("/sites/:siteId", auth, async (req, res) => {
-  const siteId = req.params.siteId;
-  const site = await AppDataSource.manager.getRepository(Site).findOne({
-    where: {id: siteId},
-    relations: ["team"]
-  });
-
-  res.send(site);
-})
-
-app.get("/sites/:siteId/rules", auth, async (req, res) => {
-
-  const siteId = req.params.siteId;
-  const [data, total] = await AppDataSource.manager.getRepository(RuleEntity).findAndCount({where: {site: {id: siteId}}});
-
-  res.send({data, total});
 })
 
 app.all("/p/:siteKey/*", async (req, res) => {
@@ -138,5 +81,4 @@ AppDataSource.initialize().then(() => {
   app.listen(port, () => {
     console.log(`Listening on port ${port}...`);
   });
-  
 });

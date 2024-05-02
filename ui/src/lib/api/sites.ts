@@ -27,3 +27,12 @@ export const createSite = async (teamId: string, site: any, fetch: typeof window
 
     return await resonse.json();
 }
+
+export const deleteSite = async (siteId: string, fetch: typeof window.fetch) => {
+    const resonse = await fetch(`${PUBLIC_API_URL}/sites/${siteId}`, {
+        method: "DELETE",
+        credentials: "include"
+    });
+
+    return resonse.status === 204;
+}

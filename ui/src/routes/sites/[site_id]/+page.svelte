@@ -4,9 +4,10 @@
 	import Strategy from "$lib/organisms/Strategy.svelte";
 	import Breadcrumb from "$lib/molecules/Breadcrumb.svelte";
     import { styleForMethod } from "$lib";
-	import MoreMenuIcon from "$lib/atoms/MoreMenuIcon.svelte";
     import { deleteRule as requestDeleteRule } from "$lib/api/rules";
     import {invalidate} from "$app/navigation";
+	import ConfirmDelete, { open, close as closeConfirmDialog } from "$lib/molecules/ConfirmDelete.svelte";
+	import RowMenu from "$lib/molecules/RowMenu.svelte";
 
     const team = $page.data.site.team;
 
@@ -20,7 +21,7 @@
 
     function deleteConfirmation(rule: any) {
         deletingRule = rule;
-        document.getElementById('confirm-delete-modal')?.showModal();
+        open();
     }
 
     async function deleteRule(rule: any) {
@@ -28,8 +29,8 @@
         if (deleted) {
             // trigger a reload of the rules
             invalidate("rules:delete")
+            closeConfirmDialog();
         }
-        document.getElementById('confirm-delete-modal')?.close();
     }
 
 </script>
@@ -62,20 +63,13 @@
                                 {/each}
                             </div>
                             <div>
-                                <div class="dropdown dropdown-end">
-                                    <button tabindex="0" type="button" on:click|stopPropagation|nonpassive={() => {}} class="btn btn-ghost btn-circle">
-                                      <div class="w-10 rounded-full">
-                                        <MoreMenuIcon />
-                                      </div>
-                                    </button>
-                                    <ul class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-                                      <li>
+                                <RowMenu>
+                                    <li>
                                         <button on:click|preventDefault|stopPropagation|nonpassive={() => deleteConfirmation(rule)} class="text-error">
                                           Delete Rule
                                         </button>
-                                      </li>
-                                    </ul>
-                                  </div>
+                                    </li>
+                                </RowMenu>
                             </div>
                         </div>
                         
@@ -96,20 +90,8 @@
 </div>
 
 <!-- Delete confirmation modal -->
-<dialog id="confirm-delete-modal" class="modal">
-  <div class="modal-box">
-    <form method="dialog">
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-      </form>
-    <h3 class="font-bold text-lg">Delete rule {deletingRule?.routes[0]}</h3>
-    <p class="py-4">
+<ConfirmDelete on:confirmed={() => deleteRule(deletingRule)} confirmBtnText="I understand, delete this rule">
+    <p>
         This action cannot be undone. This will permanently delete the rule <strong>{deletingRule?.routes[0]}</strong>.
     </p>
-
-    <div class="modal-action">
-        <button class="btn btn-error btn-block" on:click={() => deleteRule(deletingRule)}>
-            I understand, delete this rule
-        </button>
-    </div>
-  </div>
-</dialog>
+</ConfirmDelete>

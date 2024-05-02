@@ -1,9 +1,9 @@
 <script lang="ts">
-	import SaveIcon from "$lib/atoms/SaveIcon.svelte";
-	import { goto } from "$app/navigation";
+    import SaveIcon from "$lib/atoms/SaveIcon.svelte";
+    import { goto } from "$app/navigation";
     import Breadcrumb from "$lib/molecules/Breadcrumb.svelte";
-	import { page } from "$app/stores";
-	import { createSite } from "$lib/api/sites";
+    import { page } from "$app/stores";
+    import { createSite } from "$lib/api/sites";
 
     const breadcrumbs = [
         { name: "Teams", href: "/teams" },
@@ -65,7 +65,7 @@
                 <SaveIcon/> Save
             </button>
 
-            <a href="/teams" class="btn btn-link">
+            <a href="/teams/{$page.data.id}/sites" class="btn btn-link">
                 Back
             </a>
         </div>

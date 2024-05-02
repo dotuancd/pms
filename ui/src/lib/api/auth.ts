@@ -10,3 +10,22 @@ export const login = (email: string, password: string, fetch: typeof window.fetc
         credentials: "include"
     });
 }
+
+export const logout = (fetch: typeof window.fetch) => {
+    return fetch(`${PUBLIC_API_URL}/logout`, {
+        method: "POST",
+        credentials: "include"
+    });
+}
+
+export const getMe = async (fetch: typeof window.fetch) => {
+    const response = await fetch(`${PUBLIC_API_URL}/me`, {
+        credentials: "include"
+    });
+
+    if (response.status === 200) {
+        return response.json();
+    }
+
+    return null;
+}

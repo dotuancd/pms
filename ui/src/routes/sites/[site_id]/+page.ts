@@ -1,4 +1,4 @@
-import type { PageLoad } from "../../rules/[site_id]/$types";
+import type { PageLoad } from "./$types";
 import { getRules } from "$lib/api/rules";
 import { getSite } from "$lib/api/sites";
 

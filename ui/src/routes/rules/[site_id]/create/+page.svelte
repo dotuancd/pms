@@ -53,9 +53,9 @@
 
 <div class="">
     <Breadcrumb items={breadcrumbs} />
-    <header class="py-8 my-8 flex flex-row justify-between items-center">
+    <header class="py-8 my-8">
         <h1 class="block text-2xl font-bold text-accent sm:text-3xl">Create response rule</h1>
-        <p class="mt-3 sm:text-lg prose">
+        <p class="mt-3">
             Create a new response rule for the site
         </p>
     </header>

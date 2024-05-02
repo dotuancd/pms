@@ -4,6 +4,7 @@ import { Jwt } from "../../../application/shared/jwt";
 import { AppDataSource } from "../../../src/data-source";
 import { User } from "../../../src/entity/User";
 import { z } from "zod"
+import auth from "../middlewares/auth";
 
 const router = Router();
 
@@ -43,7 +44,19 @@ router.post("/login", async (req, res) => {
     });
     // return jwt
   })
-  
+
+router.post("/logout", (req, res) => {
+    res.clearCookie("AUTH");
+    res.send("Logged out");
+})
+
+router.get("/me", auth, async (req, res) => {
+    // @ts-ignore
+    const user = req.user;
+    delete user.password;
+    return res.send(user);
+})
+
 router.post("/register", (req, res) => {
     const user = z.object({
         name: z.string().min(1),
