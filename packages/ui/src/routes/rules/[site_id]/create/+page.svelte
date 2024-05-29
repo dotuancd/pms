@@ -51,6 +51,10 @@
 
 </script>
 
+<svelte:head>
+    <title>{$page.data.title} - Create rule</title>
+</svelte:head>
+
 <div class="">
     <Breadcrumb items={breadcrumbs} />
     <header class="py-8 my-8">
