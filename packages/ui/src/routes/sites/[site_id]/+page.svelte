@@ -11,6 +11,7 @@
 	import { PUBLIC_API_URL } from "$env/static/public";
 	import ClipboardJS from "clipboard";
 	import CopyIcon from "$lib/atoms/CopyIcon.svelte";
+	import RowMenuItem from "$lib/molecules/RowMenuItem.svelte";
 
     const team = $page.data.site.team;
 
@@ -36,7 +37,7 @@
         }
     }
 
-    const clipboard = new ClipboardJS('#copy-request-prefix-btn', {
+    new ClipboardJS('[data-clipboard]', {
         action: function(trigger) {
             trigger.setAttribute('aria-label', 'Copied!');
             trigger.setAttribute('data-tip', 'Copied!');
@@ -68,7 +69,7 @@
                     <input class="grow" readonly type="text" id="request-prefix" value="{PUBLIC_API_URL}/p/{$page.params.site_id}/">
                 </label>
                 
-                <button class="tooltip" data-tip="Copy url to cliboard" id="copy-request-prefix-btn" data-clipboard-target="#request-prefix">
+                <button class="tooltip" data-tip="Copy url to clipboard" data-clipboard data-clipboard-text="{PUBLIC_API_URL}/p/{$page.params.site_id}/">
                     <CopyIcon />
                 </button>
             </div>
@@ -85,16 +86,21 @@
                         <div class="flex flex-row justify-between">
                             <div>
                                 {#each rule.routes as route}
-                                    <h3 class="text-lg text-primary font-semibold">{route}</h3>
+                                    <h3 class="text-lg text-primary font-semibold flex items-center">
+                                        {route}
+                                        <button class="tooltip" on:click|preventDefault data-clipboard data-tip="Copy url to clipboard" data-clipboard-text="{route}">
+                                            <CopyIcon />
+                                        </button>
+                                    </h3>
                                 {/each}
                             </div>
                             <div>
                                 <RowMenu>
-                                    <li>
+                                    <RowMenuItem>
                                         <button on:click|preventDefault|stopPropagation|nonpassive={() => deleteConfirmation(rule)} class="text-error">
                                           Delete Rule
                                         </button>
-                                    </li>
+                                    </RowMenuItem>
                                 </RowMenu>
                             </div>
                         </div>

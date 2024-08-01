@@ -1,9 +1,9 @@
 
-import { Request, Response, request } from 'express';
+import e, { Request, Response } from 'express';
 import { ResponseStrategy } from './ResponseStrategy';
-import { Writable } from "stream"
 import { getTargetUrl } from '../shared';
 import { Resign } from './Resign';
+import axios, { AxiosResponse } from 'axios';
 
 export class ForwardRequestStrategy implements ResponseStrategy {
 
@@ -18,47 +18,50 @@ export class ForwardRequestStrategy implements ResponseStrategy {
         delete headers['content-length'];
 
         const targetUrl = this.resigner ? this.resigner.resign(url, req.method) : url;
+
+        console.log('Forwarding request to:', targetUrl, headers, req.body);
+
         try {
+            const body = ["HEAD", "GET"].includes(req.method.toUpperCase()) ? {} : {data: req.body}
 
-            // if (["HEAD", "GET"].includes(req.method.toUpperCase()) &) {
-            //     return res.status(400).send('Body not allowed for GET and HEAD requests');
-            // }
-
-            const body = ["HEAD", "GET"].includes(req.method.toUpperCase()) ? {} : {body: req.body}
-
-            const forwardedResponse = await fetch(targetUrl, {
-                method: req.method,
-                headers,
-                ...body
-                // NodeJS not support body for GET and HEAD requests
-                
-                // @ts-ignore
-                // verbose: true,
-            })
-    
+            let forwardedResponse: AxiosResponse<any, any>;
+            
+            try {
+                forwardedResponse = await axios(targetUrl.toString(), {
+                    method: req.method,
+                    headers,
+                    ...body,
+                    responseType: 'stream',
+                })
+            } catch (e) {
+                // Axios throws an error if the response status is not 2xx. But we still want to forward the response
+                if (e.response) {
+                    forwardedResponse = e.response;
+                }
+            }
+            
             const blacklistHeaders: string[] = [
                 // We rewrite encoding then if we forward heade. Client might not decode the encoding correctly
                 'content-encoding',
                 'content-length'
             ];
         
-            const responseHeaders = [...forwardedResponse.headers]
-            .filter(([key, value]) => {
+            const responseHeaders = Object.keys(forwardedResponse.headers)
+            .filter(key => {
                 return ! blacklistHeaders.includes(key.toLowerCase())
             })
-            .reduce((acc, [key, value]) => {
-                acc[key] = value;
+            .reduce((acc, key) => {
+                acc[key] = forwardedResponse.headers[key];
                 return acc;
             }, {} as Record<string, string>);
-    
-            forwardedResponse.body?.pipeTo(Writable.toWeb(res));
-    
+
+            // Forward the response
+            forwardedResponse.data.pipe(res);
             return res.status(forwardedResponse.status)
             .header(responseHeaders)
         } catch (error) {
             console.error('Error forwarding request:', error);
             return res.status(500).send(`Error forwarding request: ${error}`);
         }
-        
     }
 }

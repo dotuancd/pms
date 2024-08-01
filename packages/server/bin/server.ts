@@ -21,50 +21,73 @@ app.use(cors({
   origin: ["http://localhost:5173"],
   credentials: true
 }))
-app.use(express.json());
+// app.use(express.json());
+// app.use(express.raw())
 app.set("x-powered-by", false);
 app.use(morgan("short"));
 app.use(cookieParser())
 
+function loadSite() {
+  return async (req, res, next) => {
+    const site = await AppDataSource.getRepository(Site)
+    .createQueryBuilder()
+    .addSelect("Site.resigner")
+    .whereInIds(req.params.siteKey)
+    .getOne();
+
+    if (!site) {
+      return res.status(404).send("Site not found");
+    }
+
+    site.rules = await AppDataSource.getRepository(Site).createQueryBuilder()
+    .relation(Site, "rules")
+    .of(site)
+    .loadMany();
+
+    req.site = site;
+    return next();
+  }
+}
+
+function logRequest() {
+  return (req, res, next) => {
+    console.log(req.url);
+
+    next();
+  }
+}
+
 const port = 8080;
 
-app.get("/", (req, res) => {
+const backendRoutes = express.Router();
+backendRoutes.use(express.json());
+backendRoutes.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.use("/teams", TeamRoutes)
-app.use("/sites", SiteRoutes)
-app.use(AuthRoutes)
+backendRoutes.use("/teams", TeamRoutes)
+backendRoutes.use("/sites", SiteRoutes)
+backendRoutes.use(AuthRoutes)
 
-app.get("/rules/:ruleId", auth, async (req, res) => {
+backendRoutes.get("/rules/:ruleId", auth, async (req, res) => {
   // create rule
   const siteId = Number(req.params.ruleId);
   const rule = await AppDataSource.manager.getRepository(RuleEntity).findOne({where: {id: siteId}});
   res.send(rule);
 })
 
-app.delete("/rules/:ruleId", auth, async (req, res) => {
+backendRoutes.delete("/rules/:ruleId", auth, async (req, res) => {
   // create rule
   const siteId = Number(req.params.ruleId);
   await AppDataSource.manager.getRepository(RuleEntity).delete(siteId);
   res.status(204).send();
 })
 
-app.all("/p/:siteKey/*", async (req, res) => {
-  const site = await AppDataSource.getRepository(Site)
-  .createQueryBuilder()
-  .addSelect("Site.resigner")
-  .whereInIds(req.params.siteKey)
-  .getOne();
+app.use(backendRoutes);
 
-  site.rules = await AppDataSource.getRepository(Site).createQueryBuilder()
-  .relation(Site, "rules")
-  .of(site)
-  .loadMany();
-
-  if (!site) {
-    return res.status(404).send("Site not found");
-  }
+app.all("/p/:siteKey/*", loadSite(), logRequest(), async (req, res) => {
+  // @ts-ignore
+  const site = req.site as Site;
 
   const rules = site.rules.map((rule) => {
 
