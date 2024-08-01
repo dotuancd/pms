@@ -73,7 +73,7 @@
     <Tabs activeTab="sites" />
     <div class="flex flex-col gap-3">
         {#each $page.data.sites as site}
-            <a class="rounded-box shadow cursor-pointer flex gap-4 items-center justify-between p-4 hover:bg-base-200" href={`/sites/${site.id}`}>
+            <a class="rounded-box shadow cursor-pointer flex gap-4 items-center justify-between p-4 hover:bg-base-200" href={`/sites/${site.id}/rules`}>
                 <div>
                     <div class="flex gap-2">
                         <SiteIcon />
