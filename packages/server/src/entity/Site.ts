@@ -2,6 +2,7 @@
 import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm'
 import { Rule } from './Rule'
 import { Team } from './Team'
+import { History } from './History'
 
 @Entity({name: 'sites'})
 export class Site {
@@ -41,4 +42,8 @@ export class Site {
     @ManyToOne(() => Team, team => team.sites)
     @JoinColumn()
     team: Team
+
+    @OneToMany(() => History, history => history.site)
+    @JoinColumn()
+    history: History[]
 }

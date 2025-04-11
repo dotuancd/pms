@@ -16,10 +16,9 @@ export class ForwardRequestStrategy implements ResponseStrategy {
 
         // Remove content-length header to prevent mismatch between actual body and content-length
         delete headers['content-length'];
+        delete headers['host'];
 
         const targetUrl = this.resigner ? this.resigner.resign(url, req.method) : url;
-
-        console.log('Forwarding request to:', targetUrl, headers, req.body);
 
         try {
             const body = ["HEAD", "GET"].includes(req.method.toUpperCase()) ? {} : {data: req.body}
@@ -37,6 +36,8 @@ export class ForwardRequestStrategy implements ResponseStrategy {
                 // Axios throws an error if the response status is not 2xx. But we still want to forward the response
                 if (e.response) {
                     forwardedResponse = e.response;
+                } else {
+                    throw e;
                 }
             }
             

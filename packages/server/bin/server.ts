@@ -1,20 +1,21 @@
-
-import express from "express";
-import { ForwardRequestStrategy } from "../application/strategies/ForwardRequestStrategy";
-import { Rule } from "../application/match_rules/Rule";
-import { AppDataSource } from "../src/data-source";
-import { Site } from "../src/entity/Site";
-import { Rule as RuleEntity } from "../src/entity/Rule";
-import cors from "cors";
-import morgan from "morgan";
 import cookieParser from "cookie-parser";
-import { manager as strategyFactory } from "../application/strategies/ResponseStrategyFactory";
-
-process.loadEnvFile();
+import cors from "cors";
+import express from "express";
+import morgan from "morgan";
 import auth from "../adapters/primary/middlewares/auth";
-import TeamRoutes from "../adapters/primary/routes/TeamRoutes";
 import AuthRoutes from "../adapters/primary/routes/AuthRoutes";
 import SiteRoutes from "../adapters/primary/routes/SiteRoutes";
+import TeamRoutes from "../adapters/primary/routes/TeamRoutes";
+import HistoryRoutes from "../adapters/primary/routes/HistoryRoutes";
+import { Rule } from "../application/match_rules/Rule";
+import { ForwardRequestStrategy } from "../application/strategies/ForwardRequestStrategy";
+import { manager as strategyFactory } from "../application/strategies/ResponseStrategyFactory";
+import { AppDataSource } from "../src/data-source";
+import { Rule as RuleEntity } from "../src/entity/Rule";
+import { Site } from "../src/entity/Site";
+import logRequest from "../adapters/primary/middlewares/logRequest";
+
+process.loadEnvFile();
 
 const app = express();
 app.use(cors({
@@ -49,14 +50,6 @@ function loadSite() {
   }
 }
 
-function logRequest() {
-  return (req, res, next) => {
-    console.log(req.url);
-
-    next();
-  }
-}
-
 const port = 8080;
 
 const backendRoutes = express.Router();
@@ -67,6 +60,7 @@ backendRoutes.get("/", (req, res) => {
 
 backendRoutes.use("/teams", TeamRoutes)
 backendRoutes.use("/sites", SiteRoutes)
+backendRoutes.use("/history", HistoryRoutes)
 backendRoutes.use(AuthRoutes)
 
 backendRoutes.get("/rules/:ruleId", auth, async (req, res) => {
@@ -85,7 +79,7 @@ backendRoutes.delete("/rules/:ruleId", auth, async (req, res) => {
 
 app.use(backendRoutes);
 
-app.all("/p/:siteKey/*", loadSite(), logRequest(), async (req, res) => {
+app.all("/p/:siteKey/*", loadSite(), logRequest, async (req, res) => {
   // @ts-ignore
   const site = req.site as Site;
 
@@ -101,11 +95,18 @@ app.all("/p/:siteKey/*", loadSite(), logRequest(), async (req, res) => {
     )
   })
 
-  const matchRule = rules.find((rule) => rule.isMatch(req));
+  try {
+    const matchRule = rules.find((rule) => rule.isMatch(req));
 
-  const strategy = matchRule?.strategy || new ForwardRequestStrategy();
+    const strategy = matchRule?.strategy || new ForwardRequestStrategy();
 
-  return strategy.build(req, res);
+    return strategy.build(req, res);
+  } catch (e) {
+    console.error(e.message)
+    return res.status(500).json({
+      "error": e.message,
+    })
+  }
 })
 
 AppDataSource.initialize().then(() => {

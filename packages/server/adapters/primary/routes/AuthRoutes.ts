@@ -28,11 +28,15 @@ router.post("/login", async (req, res) => {
     .getOne();
   
     if (!user) {
-      return res.status(401).send("Invalid email or password");
+      return res.status(401).json({
+        message: "Invalid email or password"
+      });
     }
   
     if (!Password.verify(password, user.password)) {
-      return res.status(401).send("Invalid email or password");
+      return res.status(401).json({
+        message: "Invalid email or password"
+      });
     }
   
     delete user.password
