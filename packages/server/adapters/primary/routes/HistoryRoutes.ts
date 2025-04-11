@@ -5,7 +5,11 @@ import { AppDataSource } from '../../../src/data-source';
 
 const router = Router();
 router.get('/:siteId', async (req, res) => {
-  const history = await AppDataSource.manager.getRepository(History).find({
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const skip = (page - 1) * limit;
+  
+  const [history, total] = await AppDataSource.manager.getRepository(History).findAndCount({
     where: {
       site: {
         id: req.params.siteId
@@ -14,9 +18,19 @@ router.get('/:siteId', async (req, res) => {
     order: {
       createdAt: "DESC",
     },
-  })
+    skip,
+    take: limit,
+  });
 
-  res.send(history);
+  res.send({
+    data: history,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    }
+  });
 })
 
 export default router;
